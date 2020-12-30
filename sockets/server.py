@@ -50,9 +50,9 @@ def handle_client(conn, addr, handle):
 			if msg != DISCONNECT_MESSAGE and msg != handle:
 				old_msg_list = msg_list
 				msg_list.append(msg)
-				print(msg_list)
+#				print(msg_list)
 #				call updater to send the message to the other clients. may need thread!
-#				updater()
+				updater(conn, addr, handle)
 	conn.close()
 
 # handles sending messages from one client to the others
@@ -64,8 +64,13 @@ def updater(conn, addr, handle):
 	if old_msg_list != msg_list:
 #		conn.send(f'[{handle}]: {other_msg}'.encode(FORMAT))
 		for client in clients:
-			client.send(f'[{handle}]: {other_msg}'.encode(FORMAT), )		
-		
+#			client.send(f'[{handle}]: {other_msg}'.encode(FORMAT), )		
+			message = other_msg.encode(FORMAT)
+			msg_length = len(message)
+			send_length = str(msg_length).encode(FORMAT)
+			send_length += b' ' * (HEADER - len(send_length))
+			conn.send(send_length)
+			conn.send(message)		
 
 # starts the server and threads out the message input, as well as the updater to
 # their own threads.

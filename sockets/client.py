@@ -23,8 +23,13 @@ def send(msg):
 # client only receives what they send, need to fix
 def receiver():
 	while True:
-		print(client.recv(2048))
+#		print(client.recv(2048))
 
+		msg_length = client.recv(2048).decode(FORMAT)
+		if msg_length:
+			msg_length = int(msg_length)
+			msg = client.recv(msg_length).decode(FORMAT)
+		print(msg)
 
 def start(handle):
 	client.connect(ADDR)
