@@ -2,7 +2,7 @@ import socket
 import threading
 
 HEADER = 64
-PORT = 5000
+PORT = 5005
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
