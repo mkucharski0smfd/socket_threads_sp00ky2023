@@ -2,7 +2,7 @@ import socket
 import threading
 
 HEADER = 64
-PORT = 5000
+PORT = 5005
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = '127.0.1.1'
@@ -23,15 +23,20 @@ def send(msg):
 # client only receives what they send, need to fix
 def receiver():
 	while True:
-		print(client.recv(2048))
+#		print(client.recv(2048))
 
+		msg_length = client.recv(2048).decode(FORMAT)
+		if msg_length:
+			msg_length = int(msg_length)
+			msg = client.recv(msg_length).decode(FORMAT)
+		print(msg)
 
 def start(handle):
 	client.connect(ADDR)
 	send(handle)
 	while True:
 		thread = threading.Thread(target=receiver)
-		thread.start()
+#		thread.start()
 		to_send = input('[MY MESSAGE]: ')
 		if to_send == 'd':
 			send(DISCONNECT_MESSAGE)
