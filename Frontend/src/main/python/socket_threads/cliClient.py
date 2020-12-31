@@ -5,7 +5,7 @@ import os
 from io import StringIO
 
 HEADER = 128
-PORT = 5003
+PORT = 5005
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = '127.0.1.1'
@@ -19,13 +19,14 @@ def start(handle):
 	send(handle)
 	while True:
 		thread = threading.Thread(target=receiver)
+		thread.daemon = True
 		thread.start()
 
 		to_send = input()
 		if to_send == 'd':
 			send(DISCONNECT_MESSAGE)
+#			client.shutdown(socket.SHUT_RDWR)
 			client.close()
-#			quit()
 			break
 
 		send(to_send)
