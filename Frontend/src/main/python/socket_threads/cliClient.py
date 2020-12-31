@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import os
+from io import StringIO
 
 HEADER = 128
 PORT = 5003
