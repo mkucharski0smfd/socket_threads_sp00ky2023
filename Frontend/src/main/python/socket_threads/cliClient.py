@@ -9,6 +9,7 @@ PORT = 5005
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = '127.0.1.1'
+#SERVER = "10.0.2.5"
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,14 +48,20 @@ def send(msg):
 	client.send(message)
 
 
+#if __name__ == '__main__':
+#	try:
+#		handle = input("Enter handle: ")
+#		print("[CONNECTING] Connecting to Server...")
+#		start(handle)
+#	except KeyboardInterrupt:
+#		print('n/Disconnected')
+#		try:
+#			sys.exit(0)
+#		except SystemExit:
+#			os._exit(0)
+
 if __name__ == '__main__':
-	try:
-		handle = input("Enter handle: ")
-		print("[CONNECTING] Connecting to Server...")
-		start(handle)
-	except KeyboardInterrupt:
-		print('n/Disconnected')
-		try:
-			sys.exit(0)
-		except SystemExit:
-			os._exit(0)
+
+	handle = input("Enter handle: ")
+	print("[CONNECTING] Connecting to Server...")
+	start(handle)
