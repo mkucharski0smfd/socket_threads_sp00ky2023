@@ -3,13 +3,13 @@ import threading
 import sys
 import os
 from io import StringIO
+import time
 
 HEADER = 128
 PORT = 5005
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = '127.0.1.1'
-#SERVER = "10.0.2.5"
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,11 +26,15 @@ def start(handle):
 		to_send = input()
 		if to_send == 'd':
 			send(DISCONNECT_MESSAGE)
-#			client.shutdown(socket.SHUT_RDWR)
-			client.close()
 			break
+		else:
+			send(to_send)
+	close_client()
 
-		send(to_send)
+def close_client():
+	print("[Server]: Disconnecting")
+	print("[Server]: Goodbye")
+	client.close()
 
 
 def receiver():

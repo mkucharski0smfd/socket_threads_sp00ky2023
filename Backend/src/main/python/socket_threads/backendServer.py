@@ -6,7 +6,7 @@ import os
 HEADER = 128
 PORT = 5005
 SERVER = socket.gethostbyname(socket.gethostname())
-#SERVER = "10.0.2.5"
+#SERVER = "192.168.1.52"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -35,12 +35,7 @@ class threadTerminator:
 		if handle_length:
 			handle_length = int(handle_length)
 			handle = conn.recv(handle_length).decode(FORMAT)
-			threadID = threading.currentThread()
-#			print(f"[NEW CONNECTION] {handle} connected on thread: {threadID}")
-			print(f"[NEW CONNECTION] conn: {conn} addr: {addr}")
 
-#		clients.update({handle: addr})
-		print(clients)
 		self.handle_client(conn, addr, handle)
 
 
@@ -54,30 +49,27 @@ class threadTerminator:
 				if msg == DISCONNECT_MESSAGE:
 					connected = False
 					print(f"[{handle}] {msg}")
-					clients.pop(handle)
+#					server.close()
+					clients.remove(conn)
+					print([clients])
 					break
 
-				print(f"[{handle}] {msg}")
-
 				if msg != DISCONNECT_MESSAGE or msg != handle:
-					old_msg_list = msg_list
+#					old_msg_list = msg_list
 					msg_list.append(msg)
 					print(msg_list)
 
 					self.updater(conn, addr, handle)
 
 		self.terminate()
-#		server.shutdown(socket.SHUT_RDWR)
-		conn.close()
 
 
 	def updater(self, conn, addr, handle):
 		other_msg = msg_list[-1]
 		other_msg = ''.join([str(elem) for elem in other_msg])
 
-		if old_msg_list != msg_list:
-			for Caddr in clients.items():
-				server.send(f'[{handle}]: {other_msg}'.encode(FORMAT), )
+		for client in clients:
+			client.sendall(f'[{handle}]: {other_msg}'.encode(FORMAT))
 
 
 def start():
@@ -85,7 +77,8 @@ def start():
 	print(f"[LISTENING] Server is listening on {SERVER}, Port: {PORT}")
 	while True:
 		conn, addr = server.accept()
-#		clients.append(conn)
+		clients.append(conn)
+		print([clients])
 		c = threadTerminator()
 		thread = threading.Thread(target=c.get_handle, args=(conn, addr))
 		thread.start()		
