@@ -4,8 +4,9 @@ import sys
 import os
 
 HEADER = 128
-PORT = 5003
+PORT = 5005
 SERVER = socket.gethostbyname(socket.gethostname())
+#SERVER = "192.168.1.52"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -16,8 +17,59 @@ server.bind(ADDR)
 
 # to replace later with database
 old_msg_list = []
-msg_list = ['']
+msg_list = []
 clients = []
+
+
+class threadTerminator:
+	def __init__(self):
+		self._running = True
+
+
+	def terminate(self):
+		self._running = False
+
+
+	def get_handle(self, conn, addr):
+		handle_length = conn.recv(HEADER).decode(FORMAT)
+		if handle_length:
+			handle_length = int(handle_length)
+			handle = conn.recv(handle_length).decode(FORMAT)
+
+		self.handle_client(conn, addr, handle)
+
+
+	def handle_client(self, conn, addr, handle):
+		connected = True
+		while connected:
+			msg_length = conn.recv(HEADER).decode(FORMAT)
+			if msg_length:
+				msg_length = int(msg_length)
+				msg = conn.recv(msg_length).decode(FORMAT)
+				if msg == DISCONNECT_MESSAGE:
+					connected = False
+					print(f"[{handle}] {msg}")
+#					server.close()
+					clients.remove(conn)
+					print([clients])
+					break
+
+				if msg != DISCONNECT_MESSAGE or msg != handle:
+#					old_msg_list = msg_list
+					msg_list.append(msg)
+					print(msg_list)
+
+					self.updater(conn, addr, handle)
+
+		self.terminate()
+
+
+	def updater(self, conn, addr, handle):
+		other_msg = msg_list[-1]
+		other_msg = ''.join([str(elem) for elem in other_msg])
+
+		for client in clients:
+			client.sendall(f'[{handle}]: {other_msg}'.encode(FORMAT))
 
 
 def start():
@@ -26,50 +78,12 @@ def start():
 	while True:
 		conn, addr = server.accept()
 		clients.append(conn)
-		thread = threading.Thread(target=get_handle, args=(conn, addr))
+		print([clients])
+		c = threadTerminator()
+		thread = threading.Thread(target=c.get_handle, args=(conn, addr))
 		thread.start()		
 		print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
-
-def get_handle(conn, addr):
-	handle_length = conn.recv(HEADER).decode(FORMAT)
-	if handle_length:
-		handle_length = int(handle_length)
-		handle = conn.recv(handle_length).decode(FORMAT)
-		print(f"[NEW CONNECTION] {handle} connected")
-
-	handle_client(conn, addr, handle)
-
-
-def handle_client(conn, addr, handle):
-	connected = True
-	while connected:
-		msg_length = conn.recv(HEADER).decode(FORMAT)
-		if msg_length:
-			msg_length = int(msg_length)
-			msg = conn.recv(msg_length).decode(FORMAT)
-			if msg == DISCONNECT_MESSAGE:
-				connected = False
-
-			print(f"[{handle}] {msg}")
-
-			if msg != DISCONNECT_MESSAGE or msg != handle:
-				old_msg_list = msg_list
-				msg_list.append(msg)
-				print(msg_list)
-#call updater to send the message to the other clients
-				updater(conn, addr, handle)
-	conn.close()
-
-
-def updater(conn, addr, handle):
-	other_msg = msg_list[-1]
-	other_msg = ''.join([str(elem) for elem in other_msg])
-
-	if old_msg_list != msg_list:
-		for client in clients:
-			client.send(f'[{handle}]: {other_msg}'.encode(FORMAT), )
-#			client.send(('[{}]: {}'.format(handle, other_msg)).encode(FORMAT))
 
 
 if __name__ == '__main__':

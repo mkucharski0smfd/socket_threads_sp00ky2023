@@ -3,9 +3,10 @@ import threading
 import sys
 import os
 from io import StringIO
+import time
 
 HEADER = 128
-PORT = 5003
+PORT = 5005
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 SERVER = '127.0.1.1'
@@ -19,16 +20,21 @@ def start(handle):
 	send(handle)
 	while True:
 		thread = threading.Thread(target=receiver)
+		thread.daemon = True
 		thread.start()
 
 		to_send = input()
 		if to_send == 'd':
 			send(DISCONNECT_MESSAGE)
-			client.close()
-#			quit()
 			break
+		else:
+			send(to_send)
+	close_client()
 
-		send(to_send)
+def close_client():
+	print("[Server]: Disconnecting")
+	print("[Server]: Goodbye")
+	client.close()
 
 
 def receiver():
@@ -46,14 +52,20 @@ def send(msg):
 	client.send(message)
 
 
+#if __name__ == '__main__':
+#	try:
+#		handle = input("Enter handle: ")
+#		print("[CONNECTING] Connecting to Server...")
+#		start(handle)
+#	except KeyboardInterrupt:
+#		print('n/Disconnected')
+#		try:
+#			sys.exit(0)
+#		except SystemExit:
+#			os._exit(0)
+
 if __name__ == '__main__':
-	try:
-		handle = input("Enter handle: ")
-		print("[CONNECTING] Connecting to Server...")
-		start(handle)
-	except KeyboardInterrupt:
-		print('n/Disconnected')
-		try:
-			sys.exit(0)
-		except SystemExit:
-			os._exit(0)
+
+	handle = input("Enter handle: ")
+	print("[CONNECTING] Connecting to Server...")
+	start(handle)
