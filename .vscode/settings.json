@@ -1,7 +1,0 @@
-{
-    "python.pythonPath": "/usr/local/bin/python3.8",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true,
-    "python.linting.mypyEnabled": false,
-    "python.linting.flake8Enabled": false
-}
