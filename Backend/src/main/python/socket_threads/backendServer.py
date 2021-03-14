@@ -16,7 +16,6 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 # to replace later with database
-old_msg_list = []
 msg_list = []
 clients = []
 
@@ -49,13 +48,11 @@ class threadTerminator:
 				if msg == DISCONNECT_MESSAGE:
 					connected = False
 					print(f"[{handle}] {msg}")
-#					server.close()
 					clients.remove(conn)
 					print([clients])
 					break
 
 				if msg != DISCONNECT_MESSAGE or msg != handle:
-#					old_msg_list = msg_list
 					msg_list.append(msg)
 					print(msg_list)
 
