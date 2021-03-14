@@ -15,6 +15,8 @@ IDENTIFIER = ""
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
+# working on DB!
+
 # to replace later with database
 msg_list = []
 clients = []
