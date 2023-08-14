@@ -6,7 +6,7 @@ import os
 HEADER = 128
 PORT = 5005
 SERVER = socket.gethostbyname(socket.gethostname())
-#SERVER = "192.168.1.52"
+SERVER = "127.0.0.1"
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
@@ -34,9 +34,18 @@ class threadTerminator:
 		if handle_length:
 			handle_length = int(handle_length)
 			handle = conn.recv(handle_length).decode(FORMAT)
+			print(handle + ' joined the server')
+			self.welcome_announce(handle)
 
 		self.handle_client(conn, addr, handle)
+  
+	def welcome_announce(self, handle):
+		for client in clients:
+			client.sendall(f'[{handle}] has joined the channel'.encode(FORMAT))
+	
 
+
+	#def tic_toc(self)
 
 	def handle_client(self, conn, addr, handle):
 		connected = True
@@ -77,6 +86,7 @@ def start():
 		clients.append(conn)
 		print([clients])
 		c = threadTerminator()
+		# timed_message = threading.Thread(target=c.tic_toc, args=())
 		thread = threading.Thread(target=c.get_handle, args=(conn, addr))
 		thread.start()		
 		print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
