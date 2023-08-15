@@ -3,6 +3,7 @@ import threading
 import sys
 import os
 import time
+import queue
 
 HEADER = 128
 PORT = 5005
@@ -21,7 +22,7 @@ msg_list = []
 clients = []
 bingo = ["4 8 15 16 23 42"]
 flag = ''
-
+time_queue = queue.Queue()
 
 class threadTerminator:
 	def __init__(self):
@@ -41,35 +42,29 @@ class threadTerminator:
 			self.welcome_announce(handle)
 
 		self.handle_client(conn, addr, handle)
-  
+
+
 	def welcome_announce(self, handle):
 		for client in clients:
 			client.sendall(f'[{handle}] has joined the channel'.encode(FORMAT))
-	
+
+
 	def tic_toc(self):
 		t = 3600
-		while t > 600:
+		time_queue.put(t)
+		while t > 0:
 			mins, secs = divmod(t, 60)
 			timer = '{:02d}:{:02d}'.format(mins, secs)
-			#print(timer, end="\r")
+			print(timer, end="\r")
 			for client in clients:
 				client.sendall(f'[{timer}]'.encode(FORMAT))
-			time.sleep(5)
-			t -= 5
-		while t <= 600:
-			while t >= 0:
-				msg_length = conn.recv(HEADER).decode(FORMAT)
-				if msg_length:
-					msg_length = int(msg_length)
-					msg = conn.recv(msg_length).decode(FORMAT)
-					if msg == bingo:
-						pass###!!!
-			print('ka...')
-			time.sleep(5)
-			print('...boom')
-						
+			time.sleep(1)
+			time_queue.task_done()
+			t -= 1
+			time_queue.put(t)
 		if t == 0:
 			print(flag)
+
 
 	def handle_client(self, conn, addr, handle):
 		connected = True
@@ -78,6 +73,9 @@ class threadTerminator:
 			if msg_length:
 				msg_length = int(msg_length)
 				msg = conn.recv(msg_length).decode(FORMAT)
+				cur_time = time_queue.get()
+				if msg == bingo and 0 < cur_time < 600:
+					print('bingo')
 				if msg == DISCONNECT_MESSAGE:
 					connected = False
 					print(f"[{handle}] {msg}")
@@ -128,5 +126,5 @@ if __name__ == '__main__':
 			sys.exit(0)
 		except SystemExit:
 			os._exit(0)
-	except:
-		pass
+	#except:
+	#	pass

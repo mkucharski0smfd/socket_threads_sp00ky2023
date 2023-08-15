@@ -65,7 +65,13 @@ def send(msg):
 #			os._exit(0)
 
 if __name__ == '__main__':
-
-	handle = input("Enter handle: ")
-	print("[CONNECTING] Connecting to Server...")
-	start(handle)
+	try:
+		handle = input("Enter handle: ")
+		print("[CONNECTING] Connecting to Server...")
+		start(handle)
+	except ConnectionRefusedError:
+		print("Server is down.")
+		try:
+			sys.exit(0)
+		except SystemExit:
+			os._exit(0)
