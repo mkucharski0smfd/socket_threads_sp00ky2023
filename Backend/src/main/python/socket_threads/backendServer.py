@@ -2,6 +2,7 @@ import socket
 import threading
 import sys
 import os
+import time
 
 HEADER = 128
 PORT = 5005
@@ -18,6 +19,8 @@ server.bind(ADDR)
 # to replace later with database
 msg_list = []
 clients = []
+bingo = ["4 8 15 16 23 42"]
+flag = ''
 
 
 class threadTerminator:
@@ -43,9 +46,30 @@ class threadTerminator:
 		for client in clients:
 			client.sendall(f'[{handle}] has joined the channel'.encode(FORMAT))
 	
-
-
-	#def tic_toc(self)
+	def tic_toc(self):
+		t = 3600
+		while t > 600:
+			mins, secs = divmod(t, 60)
+			timer = '{:02d}:{:02d}'.format(mins, secs)
+			#print(timer, end="\r")
+			for client in clients:
+				client.sendall(f'[{timer}]'.encode(FORMAT))
+			time.sleep(5)
+			t -= 5
+		while t <= 600:
+			while t >= 0:
+				msg_length = conn.recv(HEADER).decode(FORMAT)
+				if msg_length:
+					msg_length = int(msg_length)
+					msg = conn.recv(msg_length).decode(FORMAT)
+					if msg == bingo:
+						pass###!!!
+			print('ka...')
+			time.sleep(5)
+			print('...boom')
+						
+		if t == 0:
+			print(flag)
 
 	def handle_client(self, conn, addr, handle):
 		connected = True
@@ -81,14 +105,15 @@ class threadTerminator:
 def start():
 	server.listen()
 	print(f"[LISTENING] Server is listening on {SERVER}, Port: {PORT}")
+	c = threadTerminator()
+	timed_message = threading.Thread(target=c.tic_toc)
+	timed_message.start()
 	while True:
 		conn, addr = server.accept()
 		clients.append(conn)
 		print([clients])
-		c = threadTerminator()
-		# timed_message = threading.Thread(target=c.tic_toc, args=())
 		thread = threading.Thread(target=c.get_handle, args=(conn, addr))
-		thread.start()		
+		thread.start()
 		print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
 
 
@@ -103,3 +128,5 @@ if __name__ == '__main__':
 			sys.exit(0)
 		except SystemExit:
 			os._exit(0)
+	except:
+		pass
