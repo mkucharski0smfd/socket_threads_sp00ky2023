@@ -2,8 +2,6 @@ import socket
 import threading
 import sys
 import os
-from io import StringIO
-import time
 
 HEADER = 128
 PORT = 5005
@@ -50,19 +48,6 @@ def send(msg):
 	send_length += b' ' * (HEADER - len(send_length))
 	client.send(send_length)
 	client.send(message)
-
-
-#if __name__ == '__main__':
-#	try:
-#		handle = input("Enter handle: ")
-#		print("[CONNECTING] Connecting to Server...")
-#		start(handle)
-#	except KeyboardInterrupt:
-#		print('n/Disconnected')
-#		try:
-#			sys.exit(0)
-#		except SystemExit:
-#			os._exit(0)
 
 if __name__ == '__main__':
 	try:
