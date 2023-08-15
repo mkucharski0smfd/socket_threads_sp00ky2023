@@ -20,9 +20,12 @@ server.bind(ADDR)
 # to replace later with database
 msg_list = []
 clients = []
-bingo = ["4 8 15 16 23 42"]
+bingo = "4 8 15 16 23 42"
 flag = ''
 time_queue = queue.Queue()
+timer_reset = 0
+#t = 3600
+t = 600 #for testing
 
 class threadTerminator:
 	def __init__(self):
@@ -50,17 +53,23 @@ class threadTerminator:
 
 
 	def tic_toc(self):
-		t = 3600
+		global t
 		time_queue.put(t)
 		while t > 0:
+			if timer_reset == 1:
+				timer_reset == 0
+    			#t = 3600
+				t = 600 ##testing
+			#mins, secs = divmod(t, 60)
+			#timer = '{:02d}:{:02d}'.format(mins, secs)
 			mins, secs = divmod(t, 60)
 			timer = '{:02d}:{:02d}'.format(mins, secs)
 			print(timer, end="\r")
 			for client in clients:
 				client.sendall(f'[{timer}]'.encode(FORMAT))
-			time.sleep(1)
+			time.sleep(20)
 			time_queue.task_done()
-			t -= 1
+			t -= 20
 			time_queue.put(t)
 		if t == 0:
 			print(flag)
@@ -68,6 +77,7 @@ class threadTerminator:
 
 	def handle_client(self, conn, addr, handle):
 		connected = True
+		global timer_reset
 		while connected:
 			msg_length = conn.recv(HEADER).decode(FORMAT)
 			if msg_length:
@@ -75,7 +85,8 @@ class threadTerminator:
 				msg = conn.recv(msg_length).decode(FORMAT)
 				cur_time = time_queue.get()
 				if msg == bingo and 0 < cur_time < 600:
-					print('bingo')
+					print('bingo entered')
+					timer_reset = 1
 				if msg == DISCONNECT_MESSAGE:
 					connected = False
 					print(f"[{handle}] {msg}")
