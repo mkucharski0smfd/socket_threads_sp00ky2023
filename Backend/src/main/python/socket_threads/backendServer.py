@@ -74,7 +74,7 @@ class threadTerminator:
 		if t == 0:
 			print(flag)
 
-
+  
 	def handle_client(self, conn, addr, handle):
 		connected = True
 		global timer_reset
