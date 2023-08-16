@@ -44,7 +44,6 @@ class threadTerminator:
 			client.sendall(f'[{handle}] has joined the channel'.encode(FORMAT))
 	
 
-
 	#def tic_toc(self)
 
 	def handle_client(self, conn, addr, handle):
